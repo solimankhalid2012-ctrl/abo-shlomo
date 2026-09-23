@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abu Shlomo | Profile</title>
+    <link rel="icon" href="https://files.catbox.moe/nguky8.gif" type="image/gif">
+    <link rel="shortcut icon" href="https://files.catbox.moe/nguky8.gif" type="image/gif">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -827,14 +829,33 @@
         bgVideo.addEventListener('canplay', tryVideo);
         bgVideo.addEventListener('error', (e) => console.log("Video error:", e));
 
+        // ===== تجهيز الصوت مبكراً لمنع التقطيع =====
+        bgAudio.volume = 0.4;
+        bgAudio.preload = 'auto';
+        bgAudio.load();
+        const trackArtist = document.getElementById('track-artist');
+        bgAudio.addEventListener('canplaythrough', () => { trackArtist.innerText = 'Now Playing'; }, { once: true });
+        bgAudio.addEventListener('waiting', () => { trackArtist.innerText = 'Buffering...'; });
+        bgAudio.addEventListener('playing', () => { trackArtist.innerText = 'Now Playing'; });
+        bgAudio.addEventListener('error', (e) => console.log("Audio error:", e));
+
         // ===== تشغيل كل شيء عند الضغط =====
         entryScreen.addEventListener('click', () => {
             entryScreen.style.opacity = '0';
             setTimeout(() => { entryScreen.style.display = 'none'; }, 1500);
 
-            bgAudio.volume = 0.4;
-            bgAudio.load();
-            bgAudio.play().catch(e => console.log("Audio play blocked:", e));
+            const startAudio = () => {
+                bgAudio.volume = 0.4;
+                bgAudio.play().catch(e => console.log("Audio play blocked:", e));
+            };
+            // لو الصوت جاهز شغله فوراً، وإلا انتظر اكتمال التحميل لمنع التقطيع
+            if (bgAudio.readyState >= 3) {
+                startAudio();
+            } else {
+                trackArtist.innerText = 'Loading...';
+                bgAudio.addEventListener('canplaythrough', startAudio, { once: true });
+                setTimeout(startAudio, 3000); // fallback لو تأخر السيرفر
+            }
             
             tryVideo();
             
