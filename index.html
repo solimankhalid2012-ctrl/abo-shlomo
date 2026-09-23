@@ -952,26 +952,26 @@
             });
         });
 
-        // ===== عداد الزوار (حقيقي - Abacus، مقاوم لـ 429) =====
+        // ===== عداد الزوار (حقيقي - Abacus، يزيد مع كل F5) =====
         (function () {
             const el = document.getElementById('visitor-count');
             const NS = 'abushlomo-profile', KEY = 'visits';
             const cached = parseInt(localStorage.getItem('abushlomo-count') || '0', 10);
             if (cached > 0) el.innerText = cached.toLocaleString();
-            // عد مرة واحدة فقط لكل جلسة لتجنب 429 من كثرة التحديث
-            const already = sessionStorage.getItem('abushlomo-counted');
-            const url = already
+            // منع السبام: hit واحد فقط كل 10 ثواني، الباقي قراءة فقط
+            const last = parseInt(localStorage.getItem('abushlomo-last') || '0', 10);
+            const now = Date.now();
+            const url = (now - last < 10000)
                 ? `https://abacus.jasoncameron.dev/get/${NS}/${KEY}`
                 : `https://abacus.jasoncameron.dev/hit/${NS}/${KEY}`;
+            if (now - last >= 10000) localStorage.setItem('abushlomo-last', String(now));
             fetch(url)
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(d => {
                     el.innerText = Number(d.value).toLocaleString();
                     localStorage.setItem('abushlomo-count', d.value);
-                    sessionStorage.setItem('abushlomo-counted', '1');
                 })
                 .catch(() => {
-                    // 429 أو انقطاع: اعرض آخر رقم محفوظ بدون خطأ في الكونسول
                     if (cached > 0) {
                         el.innerText = cached.toLocaleString();
                     } else {
