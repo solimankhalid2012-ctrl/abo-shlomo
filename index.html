@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abu Shlomo | Profile</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* ============ 1. شاشة الدخول ============ */
+        #entry-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: pointer;
+            transition: opacity 1.5s ease;
+        }
+        #entry-screen h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 24px;
+            letter-spacing: 8px;
+            color: #888;
+            animation: pulse 2.5s infinite;
+            text-align: center;
+        }
+
+        /* ============ 2. خلفية الفيديو ============ */
+        .video-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            filter: brightness(0.7) contrast(1.1);
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: -1;
+            display: none;
+        }
+
+        /* ============ 3. البطاقة الزجاجية ============ */
+        .glass-card {
+            position: relative;
+            background: rgba(10, 10, 10, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 25px;
+            padding: 40px 35px;
+            text-align: center;
+            width: 90%;
+            max-width: 370px;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.9), 
+                inset 0 0 20px rgba(255,255,255,0.02);
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1) 0.5s;
+            display: none;
+        }
+
+        /* ============ الصورة الشخصية والأنيميشن الفاخر ============ */
+        .profile-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 22px;
+            padding: 10px;
+        }
+
+        .profile-img {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            border: 3px solid #000;
+            object-fit: cover;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 
+                0 0 35px rgba(0, 0, 0, 0.95),
+                0 0 20px rgba(212, 175, 55, 0.25),
+                inset 0 0 15px rgba(0, 0, 0, 0.8);
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-img:hover { 
+            transform: scale(1.08) rotate(3deg); 
+            box-shadow: 
+                0 0 45px rgba(255, 215, 0, 0.65),
+                0 0 90px rgba(0, 0, 0, 0.95);
+            border-color: #d4af37;
+        }
+
+        /* إطار دوّار مدوّر بالأسود والذهبي الملكي */
+        .profile-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            border-radius: 50%;
+            background: conic-gradient(
+                #000000 0deg,
+                #d4af37 70deg,
+                #000000 140deg,
+                #ffd700 230deg,
+                #000000 300deg,
+                #d4af37 360deg
+            );
+            animation: rotateGradient 5s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+            padding: 3px;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.45));
+        }
+
+        /* حلقة خارجية ثانية نابضة ودوارة بالاتجاه المعاكس */
+        .profile-wrapper::after {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px;
+            width: calc(100% + 24px);
+            height: calc(100% + 24px);
+            border-radius: 50%;
+            border: 2px dashed rgba(212, 175, 55, 0.4);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.9);
+            animation: rotateRingReverse 12s linear infinite, pulseGlow 3s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rotateGradient {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateRingReverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                opacity: 0.4;
+                transform: rotate(360deg) scale(0.97);
+                border-color: rgba(0, 0, 0, 0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: rotate(0deg) scale(1.04);
+                border-color: rgba(255, 215, 0, 0.7);
+            }
+        }
+
+        /* العنوان الرئيسي */
+        .title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 50%, #00ffcc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
+        }
+
+        .subtitle {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 14px;
+            color: #bbb;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .location {
+            font-family: 'Playfair Display', serif;
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* أزرار التواصل */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+            font-size: 19px;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .social-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-8px) scale(1.15);
+            box-shadow: 0 15px 30px rgba(255,255,255,0.2);
+            border-color: #fff;
+        }
+
+        .social-btn.tiktok:hover {
+            background: #000;
+            color: #fff;
+            border-color: #25F4EE;
+            box-shadow: 0 15px 30px rgba(37, 244, 238, 0.4);
+        }
+
+        .social-btn.discord:hover {
+            background: #5865F2;
+            color: #fff;
+            border-color: #5865F2;
+            box-shadow: 0 15px 30px rgba(88, 101, 242, 0.4);
+        }
+
+        /* ============ 4. 🕌 زر موقع المرحومين ============ */
+        .marhumeen-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, 
+                rgba(8, 20, 15, 0.92) 0%, 
+                rgba(5, 15, 10, 0.95) 50%,
+                rgba(8, 20, 15, 0.92) 100%);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            border-radius: 60px;
+            padding: 10px 22px 10px 10px;
+            text-decoration: none;
+            color: #fff;
+            font-family: 'Amiri', serif;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(-30px);
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.7),
+                0 0 30px rgba(212, 175, 55, 0.15),
+                0 0 60px rgba(212, 175, 55, 0.08);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* إطار ذهبي متدرج */
+        .marhumeen-btn::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 60px;
+            padding: 2px;
+            background: linear-gradient(
+                135deg,
+                #d4af37 0%,
+                #ffd700 25%,
+                #b8860b 50%,
+                #ffd700 75%,
+                #d4af37 100%
+            );
+            background-size: 200% 200%;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: goldBorderMove 4s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes goldBorderMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .marhumeen-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* لمعة ذهبية */
+        .marhumeen-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 215, 0, 0.15),
+                rgba(255, 255, 200, 0.35),
+                rgba(255, 215, 0, 0.15),
+                transparent
+            );
+            animation: goldShimmer 3.5s infinite;
+            pointer-events: none;
+            transform: skewX(-20deg);
+            z-index: 1;
+        }
+
+        @keyframes goldShimmer {
+            0% { left: -100%; }
+            50%, 100% { left: 150%; }
+        }
+
+        .marhumeen-btn:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 
+                0 25px 55px rgba(0,0,0,0.85),
+                0 0 50px rgba(255, 215, 0, 0.55),
+                0 0 100px rgba(212, 175, 55, 0.3);
+            background: linear-gradient(135deg, 
+                rgba(15, 35, 25, 0.95) 0%, 
+                rgba(10, 25, 18, 0.98) 50%,
+                rgba(15, 35, 25, 0.95) 100%);
+        }
+
+        .marhumeen-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #d4af37 100%);
+            color: #0a1410;
+            font-size: 21px;
+            flex-shrink: 0;
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.5),
+                inset 0 0 10px rgba(255, 255, 255, 0.4);
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+
+        .marhumeen-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            animation: iconPulse 2.5s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes iconPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.8;
+            }
+            50% { 
+                transform: scale(1.15); 
+                opacity: 0;
+            }
+        }
+
+        .marhumeen-btn:hover .marhumeen-icon {
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .marhumeen-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .marhumeen-label {
+            font-family: 'Amiri', serif;
+            font-size: 9px;
+            color: #c9a227;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 400;
+            opacity: 0.85;
+        }
+
+        .marhumeen-title {
+            font-family: 'Amiri', serif;
+            font-size: 19px;
+            font-weight: 700;
+            background: linear-gradient(180deg, #fff8dc 0%, #ffd700 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .marhumeen-subtitle {
+            font-family: 'Scheherazade New', serif;
+            font-size: 12px;
+            color: #90b890;
+            letter-spacing: 0.5px;
+            font-style: italic;
+            line-height: 1;
+        }
+
+        .marhumeen-arrow {
+            color: #ffd700;
+            font-size: 11px;
+            margin-left: 4px;
+            opacity: 0.6;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .marhumeen-btn:hover .marhumeen-arrow {
+            opacity: 1;
+            transform: translateX(4px);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        /* ============ 5. عداد الزوار ============ */
+        .visitor-counter {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.7);
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(10px);
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 15px;
+            letter-spacing: 2px;
+            opacity: 0;
+            transition: opacity 1.5s ease 1.5s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .visitor-counter i {
+            color: #00ffcc;
+            animation: blink 3s infinite;
+            font-size: 16px;
+        }
+
+        /* ============ 6. مشغل الموسيقى ============ */
+        .music-player {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(10, 10, 10, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 12px 20px 12px 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.02);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1) 1s;
+            z-index: 100;
+            min-width: 320px;
+        }
+
+        .music-player.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .album-art {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .album-art.playing {
+            animation: albumPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes albumPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 30px rgba(0,255,204,0.2); }
+        }
+
+        .track-info {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+
+        .track-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 13px;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-icon {
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .volume-icon:hover {
+            color: #00ffcc;
+        }
+
+        .volume-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .volume-fill {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, #00ffcc, #00b8a9);
+            border-radius: 4px;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px rgba(0,255,204,0.5);
+        }
+
+        .volume-bar:hover .volume-fill {
+            box-shadow: 0 0 15px rgba(0,255,204,0.8);
+        }
+
+        .play-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .play-btn:hover {
+            background: #00ffcc;
+            color: #000;
+            border-color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0,255,204,0.5);
+            transform: scale(1.1);
+        }
+
+        .play-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ============ 7. إشعار النسخ ============ */
+        .copy-toast {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(0, 255, 204, 0.15);
+            border: 1px solid rgba(0, 255, 204, 0.4);
+            color: #00ffcc;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            z-index: 9998;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ============ الحركات العامة ============ */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.85); }
+        }
+
+        /* ============ للموبايل ============ */
+        @media (max-width: 600px) {
+            .music-player {
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+                min-width: auto;
+            }
+            .visitor-counter {
+                top: 15px;
+                right: 15px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+            .glass-card {
+                padding: 35px 25px;
+                max-width: 320px;
+            }
+            .title { font-size: 19px; letter-spacing: 3px; }
+            .profile-img { width: 100px; height: 100px; }
+
+            .marhumeen-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 14px 8px 8px;
+                gap: 10px;
+                border-radius: 50px;
+            }
+            .marhumeen-btn::after {
+                border-radius: 50px;
+            }
+            .marhumeen-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+            .marhumeen-label { font-size: 7px; letter-spacing: 2px; }
+            .marhumeen-title { font-size: 15px; }
+            .marhumeen-subtitle { font-size: 10px; }
+            .marhumeen-arrow { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="entry-screen">
+        <h1>CLICK TO ENTER</h1>
+    </div>
+
+    <video class="video-bg" id="bg-video" autoplay muted loop playsinline preload="auto">
+        <source src="https://files.catbox.moe/hni8kj.mp4" type="video/mp4">
+    </video>
+    
+    <audio id="bg-audio" loop preload="auto">
+        <source src="https://files.catbox.moe/z6csda.mp4" type="audio/mp4">
+    </audio>
+    
+    <div class="overlay" id="overlay"></div>
+
+    <a href="https://solimankhalid2012-ctrl.github.io/mr7omin/" target="_blank" class="marhumeen-btn" id="marhumeen-btn">
+        <div class="marhumeen-icon">
+            <i class="fa-solid fa-mosque"></i>
+        </div>
+        <div class="marhumeen-text">
+            <div class="marhumeen-label">WEBSITE</div>
+            <div class="marhumeen-title">موقع المرحومين</div>
+            <div class="marhumeen-subtitle">نسألكم الفاتحة</div>
+        </div>
+        <i class="fa-solid fa-arrow-up-right-from-square marhumeen-arrow"></i>
+    </a>
+
+    <div class="visitor-counter" id="counter">
+        <i class="fa-solid fa-eye"></i>
+        <span id="visitor-count">...</span>
+    </div>
+
+    <div class="music-player" id="music-player">
+        <img src="https://files.catbox.moe/nguky8.gif" 
+             alt="Album Art" class="album-art" id="album-art">
+        
+        <div class="track-info">
+            <div class="track-title" id="track-title">ABU SHLOMO</div>
+            <div class="track-artist" id="track-artist">Now Playing</div>
+            
+            <div class="volume-container">
+                <i class="fa-solid fa-volume-high volume-icon" id="volume-icon"></i>
+                <div class="volume-bar" id="volume-bar">
+                    <div class="volume-fill" id="volume-fill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="play-btn" id="play-btn">
+            <i class="fa-solid fa-pause" id="play-icon"></i>
+        </button>
+    </div>
+
+    <div class="copy-toast" id="copy-toast">
+        <i class="fa-solid fa-check"></i> COPIED!
+    </div>
+
+    <div class="glass-card" id="card">
+        <div class="profile-wrapper">
+            <img src="https://files.catbox.moe/nguky8.gif" 
+                 alt="Abu Shlomo" class="profile-img">
+        </div>
+        
+        <h1 class="title">ABU SHLOMO</h1>
+        <p class="subtitle">Passion to Impact</p>
+        <p class="location"><i class="fa-solid fa-location-dot"></i> Umm al-Fahm, Israel</p>
+
+        <div class="social-links">
+            <a href="https://www.tiktok.com/@aboshlomo" target="_blank" class="social-btn tiktok">
+                <i class="fa-brands fa-tiktok"></i>
+            </a>
+            
+            <div class="social-btn discord" id="discord-btn">
+                <i class="fa-brands fa-discord"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const entryScreen = document.getElementById('entry-screen');
+        const bgVideo = document.getElementById('bg-video');
+        const bgAudio = document.getElementById('bg-audio');
+        const overlay = document.getElementById('overlay');
+        const card = document.getElementById('card');
+        const counter = document.getElementById('counter');
+        const musicPlayer = document.getElementById('music-player');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const volumeBar = document.getElementById('volume-bar');
+        const volumeFill = document.getElementById('volume-fill');
+        const volumeIcon = document.getElementById('volume-icon');
+        const albumArt = document.getElementById('album-art');
+        const copyToast = document.getElementById('copy-toast');
+        const marhumeenBtn = document.getElementById('marhumeen-btn');
+
+        // ===== تشغيل كل شيء =====
+        entryScreen.addEventListener('click', () => {
+            entryScreen.style.opacity = '0';
+            setTimeout(() => { entryScreen.style.display = 'none'; }, 1500);
+
+            bgAudio.volume = 0.4;
+            bgAudio.play().catch(e => console.log("Audio play blocked:", e));
+            
+            bgVideo.style.display = 'block';
+            bgVideo.currentTime = 0;
+            bgVideo.play().catch(e => console.log("Video play blocked:", e));
+            
+            overlay.style.display = 'block';
+            card.style.display = 'block';
+            counter.style.display = 'flex';
+
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+                counter.style.opacity = '1';
+                musicPlayer.classList.add('visible');
+                albumArt.classList.add('playing');
+                marhumeenBtn.classList.add('visible');
+            }, 100);
+
+            updateVolumeUI();
+        });
+
+        bgVideo.addEventListener('pause', () => bgVideo.play());
+        bgVideo.addEventListener('ended', () => bgVideo.play());
+
+        // ===== التحكم بالموسيقى =====
+        playBtn.addEventListener('click', () => {
+            if (bgAudio.paused) {
+                bgAudio.play();
+                playIcon.className = 'fa-solid fa-pause';
+                albumArt.classList.add('playing');
+            } else {
+                bgAudio.pause();
+                playIcon.className = 'fa-solid fa-play';
+                albumArt.classList.remove('playing');
+            }
+        });
+
+        let isDragging = false;
+
+        function setVolume(e) {
+            const rect = volumeBar.getBoundingClientRect();
+            let x = (e.clientX || e.touches[0].clientX) - rect.left;
+            let percent = Math.max(0, Math.min(1, x / rect.width));
+            bgAudio.volume = percent;
+            volumeFill.style.width = (percent * 100) + '%';
+            updateVolumeIcon(percent);
+        }
+
+        function updateVolumeUI() {
+            volumeFill.style.width = (bgAudio.volume * 100) + '%';
+            updateVolumeIcon(bgAudio.volume);
+        }
+
+        function updateVolumeIcon(vol) {
+            volumeIcon.className = 'volume-icon fa-solid ' + 
+                (vol === 0 ? 'fa-volume-xmark' : 
+                 vol < 0.5 ? 'fa-volume-low' : 
+                 'fa-volume-high');
+        }
+
+        volumeBar.addEventListener('mousedown', (e) => { isDragging = true; setVolume(e); });
+        document.addEventListener('mousemove', (e) => { if (isDragging) setVolume(e); });
+        document.addEventListener('mouseup', () => { isDragging = false; });
+
+        volumeBar.addEventListener('touchstart', (e) => { isDragging = true; setVolume(e); });
+        document.addEventListener('touchmove', (e) => { if (isDragging) setVolume(e); });
+        document.addEventListener('touchend', () => { isDragging = false; });
+
+        volumeIcon.addEventListener('click', () => {
+            if (bgAudio.volume > 0) {
+                bgAudio.dataset.prevVolume = bgAudio.volume;
+                bgAudio.volume = 0;
+            } else {
+                bgAudio.volume = bgAudio.dataset.prevVolume || 0.4;
+            }
+            updateVolumeUI();
+        });
+
+        // ===== زر الدسكورد =====
+        const discordBtn = document.getElementById('discord-btn');
+        const discordUser = '1455279580079460372';
+
+        discordBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(discordUser).then(() => {
+                copyToast.classList.add('show');
+                setTimeout(() => copyToast.classList.remove('show'), 2000);
+            }).catch(() => {
+                const temp = document.createElement('textarea');
+                temp.value = discordUser;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                copyToast.classList.add('show');
+                setTimeout(() => copyToast.classList.remove('show'), 2000);
+            });
+        });
+
+        // ===== عداد الزوار (حقيقي - Abacus) =====
+        fetch('https://abacus.jasoncameron.dev/hit/abushlomo-profile/visits')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('visitor-count').innerText = Number(data.value).toLocaleString();
+            })
+            .catch(() => {
+                // Fallback محلي إذا فشل الاتصال: عداد محلي حقيقي لكل جهاز
+                let localCount = parseInt(localStorage.getItem('abushlomo-visits') || '0', 10);
+                localCount++;
+                localStorage.setItem('abushlomo-visits', localCount);
+                document.getElementById('visitor-count').innerText = localCount.toLocaleString();
+            });
+    </script>
+
+</body>
+</html>
