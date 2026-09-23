@@ -727,12 +727,12 @@
         <h1>CLICK TO ENTER</h1>
     </div>
 
-    <video class="video-bg" id="bg-video" autoplay muted loop playsinline preload="auto">
+    <video class="video-bg" id="bg-video" autoplay muted loop playsinline preload="auto" poster="https://files.catbox.moe/nguky8.gif" style="display:block;background:#000 url('https://files.catbox.moe/nguky8.gif') center/cover no-repeat;">
         <source src="https://files.catbox.moe/hni8kj.mp4" type="video/mp4">
     </video>
     
     <audio id="bg-audio" loop preload="auto">
-        <source src="https://files.catbox.moe/z6csda.mp4" type="audio/mp4">
+        <source src="https://files.catbox.moe/z6csda.mp4" type="video/mp4">
     </audio>
     
     <div class="overlay" id="overlay"></div>
@@ -817,19 +817,27 @@
         const copyToast = document.getElementById('copy-toast');
         const marhumeenBtn = document.getElementById('marhumeen-btn');
 
-        // ===== تشغيل كل شيء =====
+        // ===== تشغيل الفيديو فوراً (بدون انتظار الضغطة) =====
+        overlay.style.display = 'block';
+        bgVideo.style.display = 'block';
+        bgVideo.muted = true;
+        const tryVideo = () => bgVideo.play().catch(e => console.log("Video autoplay blocked:", e));
+        tryVideo();
+        document.addEventListener('DOMContentLoaded', tryVideo);
+        bgVideo.addEventListener('canplay', tryVideo);
+        bgVideo.addEventListener('error', (e) => console.log("Video error:", e));
+
+        // ===== تشغيل كل شيء عند الضغط =====
         entryScreen.addEventListener('click', () => {
             entryScreen.style.opacity = '0';
             setTimeout(() => { entryScreen.style.display = 'none'; }, 1500);
 
             bgAudio.volume = 0.4;
+            bgAudio.load();
             bgAudio.play().catch(e => console.log("Audio play blocked:", e));
             
-            bgVideo.style.display = 'block';
-            bgVideo.currentTime = 0;
-            bgVideo.play().catch(e => console.log("Video play blocked:", e));
+            tryVideo();
             
-            overlay.style.display = 'block';
             card.style.display = 'block';
             counter.style.display = 'flex';
 
