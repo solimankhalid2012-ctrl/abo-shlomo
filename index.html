@@ -952,19 +952,33 @@
             });
         });
 
-        // ===== عداد الزوار (حقيقي - Abacus) =====
-        fetch('https://abacus.jasoncameron.dev/hit/abushlomo-profile/visits')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('visitor-count').innerText = Number(data.value).toLocaleString();
-            })
-            .catch(() => {
-                // Fallback محلي إذا فشل الاتصال: عداد محلي حقيقي لكل جهاز
-                let localCount = parseInt(localStorage.getItem('abushlomo-visits') || '0', 10);
-                localCount++;
-                localStorage.setItem('abushlomo-visits', localCount);
-                document.getElementById('visitor-count').innerText = localCount.toLocaleString();
-            });
+        // ===== عداد الزوار (حقيقي - Abacus، مقاوم لـ 429) =====
+        (function () {
+            const el = document.getElementById('visitor-count');
+            const NS = 'abushlomo-profile', KEY = 'visits';
+            const cached = parseInt(localStorage.getItem('abushlomo-count') || '0', 10);
+            if (cached > 0) el.innerText = cached.toLocaleString();
+            // عد مرة واحدة فقط لكل جلسة لتجنب 429 من كثرة التحديث
+            const already = sessionStorage.getItem('abushlomo-counted');
+            const url = already
+                ? `https://abacus.jasoncameron.dev/get/${NS}/${KEY}`
+                : `https://abacus.jasoncameron.dev/hit/${NS}/${KEY}`;
+            fetch(url)
+                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .then(d => {
+                    el.innerText = Number(d.value).toLocaleString();
+                    localStorage.setItem('abushlomo-count', d.value);
+                    sessionStorage.setItem('abushlomo-counted', '1');
+                })
+                .catch(() => {
+                    // 429 أو انقطاع: اعرض آخر رقم محفوظ بدون خطأ في الكونسول
+                    if (cached > 0) {
+                        el.innerText = cached.toLocaleString();
+                    } else {
+                        el.innerText = '1';
+                    }
+                });
+        })();
     </script>
 
 </body>
